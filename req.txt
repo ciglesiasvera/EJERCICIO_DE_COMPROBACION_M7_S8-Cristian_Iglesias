@@ -1,0 +1,72 @@
+CUE: CONSULTAS PERSONALIZADAS
+
+REBOUND EXERCISE: REALIZANDO CONSULTAS SIN FORMATO POR MEDIO DE MANAGER.RAW()
+
+Para resolver este ejercicio, anteriormente debe haber revisado la lectura y los videos del CUE:
+Consultas Personalizadas.
+
+EJERCICIO:
+
+Partiendo del modelo creado en ejercicios anteriores (Fabrica y Producto), realizar las siguientes 
+consultas:
+
+1. Obtener todas las fábricas y productos por medio de una consulta SQL, haciendo uso del método 
+raw(). Para los productos imprima la fábrica correspondiente. 
+
+Salida de Fábricas:
+
+1 P&G
+2 COLGATE
+
+Salida de Productos:
+
+1 Colgate 360 es fabricado por COLGATE.
+2 Speed Stick 27/7 es fabricado por COLGATE.
+3 Protex Aloe es fabricado por COLGATE.
+4 Downy Aroma Floral es fabricado por P&G.
+5 Crest Premium es fabricado por P&G.
+6 Ariel Suavisante es fabricado por P&G.
+
+R:
+#Obtener fábricas
+from productos.models import Fabrica
+
+fabricas = Fabrica.objects.raw('SELECT id, nombre FROM productos_fabrica')
+
+for fabrica in fabricas:
+    print(f'{fabrica.id} {fabrica.nombre}')
+
+#Obtener productos
+from productos.models import Producto
+
+productos = Producto.objects.raw('SELECT id, nombre, fabrica_id FROM productos_producto')
+
+for producto in productos:
+    print(f'{producto.id} {producto.nombre} {producto.fabrica_id}')
+
+
+2. Realizar una consulta pasando los parámetros por raw que busque el producto “Protex Aloe”, y 
+devuelva quien lo fabrica.
+
+Salida:
+
+1 El producto: Protex Aloe es fabricado por COLGATE
+
+R:
+from productos.models import Producto
+
+producto = Producto.objects.raw('''
+    SELECT p.id, p.nombre, f.nombre as fabrica_nombre
+    FROM productos_producto p
+    JOIN productos_fabrica f ON p.fabrica_id = f.id
+    WHERE p.nombre = %s
+''', ['Protex Aloe'])
+
+for p in producto:
+    print(f'El producto: {p.nombre} es fabricado por {p.fabrica_nombre}')
+
+
+
+
+
+
